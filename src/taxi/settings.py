@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # third-party apps
+    'channels',
     'rest_framework',
     # local apps
     'trips',
@@ -70,6 +71,8 @@ TEMPLATES = [
         },
     },
 ]
+
+ASGI_APPLICATION = 'taxi.routing.application'
 
 WSGI_APPLICATION = 'taxi.wsgi.application'
 
@@ -126,3 +129,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Channels settings
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [REDIS_URL],
+        },
+    },
+}
