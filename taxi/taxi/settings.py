@@ -40,9 +40,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
+
+    # Third party apps
+    'channels',
     'rest_framework',
-    'trips',
+
+    # Custom apps
     'authentication',
+    'trips',
 ]
 
 MIDDLEWARE = [
@@ -135,4 +140,19 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Custom User model
 AUTH_USER_MODEL = 'authentication.User'
+
+# Django Channels
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [REDIS_URL],
+        },
+    },
+}
+
+ASGI_APPLICATION = 'taxi.routing.application'
