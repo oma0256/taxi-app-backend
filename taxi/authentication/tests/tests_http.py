@@ -11,7 +11,7 @@ User = get_user_model()
 PASSWORD = 'pAssw0rd!'
 
 
-class AuthenticationTest(APITestCase):
+class BaseTest(APITestCase):
     def create_user(self, username='user@example.com', password=PASSWORD):
         return User.objects.create_user(
             username=username,
@@ -20,6 +20,15 @@ class AuthenticationTest(APITestCase):
             password=password
         )
 
+    def login_user(self, username, password=PASSWORD):
+        response = self.client.post(reverse('authentication:log_in'), data={
+            'username': username,
+            'password': PASSWORD,
+        })
+        return response
+
+
+class AuthenticationTest(BaseTest):
     def test_user_can_sign_up(self):
         response = self.client.post(reverse('authentication:sign_up'), data={
             'username': 'user@example.com',
@@ -37,12 +46,7 @@ class AuthenticationTest(APITestCase):
 
     def test_user_can_log_in(self):
         user = self.create_user()
-        response = self.client.post(reverse('authentication:log_in'), data={
-            'username': user.username,
-            'password': PASSWORD,
-        })
-
-        # Parse payload data from access token.
+        response = self.login_user(user.username)
         access = response.data['access']
         header, payload, signature = access.split('.')
         decoded_payload = base64.b64decode(f'{payload}==')
